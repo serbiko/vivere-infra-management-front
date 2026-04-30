@@ -61,9 +61,24 @@ export class LoginComponent {
   }
 
   login() {
-    this.authService.login(this.userData.email, this.userData.password).subscribe(tokens => {
-      this.userStore.setTokens(tokens); // Guarda o Token JWT [cite: 16]
-      this.router.navigate(['/dashboard']);
-    });
-  }
+  console.log('Tentando logar com:', this.userData.email);
+  
+  this.authService.login(this.userData.email, this.userData.password).subscribe({
+    next: (tokens) => {
+      console.log('Tokens recebidos com sucesso:', tokens);
+      
+      // Armazena os tokens na Store
+      this.userStore.setTokens(tokens); 
+      
+      // Força a navegação para o dashboard
+      this.router.navigate(['/dashboard']).then(nav => {
+        console.log('Navegação para dashboard realizada?', nav);
+      });
+    },
+    error: (err) => {
+      console.error('Erro detalhado no login:', err);
+      alert('Falha no login: verifique suas credenciais.');
+    }
+  });
+}
 }
