@@ -22,144 +22,514 @@ interface EstruturaGabarito {
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="stock-container">
-      <header class="stock-header">
-        <h2 style="color: var(--vivere-black); margin: 0;">📦 Gestão de Estoque e Estruturas</h2>
-        <div class="tab-menu">
-          <button [class.active]="tab === 'inventario'" (click)="tab = 'inventario'">Inventário Global</button>
-          <button [class.active]="tab === 'gabarito'" (click)="tab = 'gabarito'">Gabaritos de Estruturas</button>
-        </div>
-      </header>
+    <header class="page-header">
+      <div class="page-header__title">
+        <span class="eyebrow">Inventário</span>
+        <h1>Estoque e estruturas</h1>
+        <p class="subtitle">Inventário global e gabaritos de composição.</p>
+      </div>
+      <div class="page-header__right">
+        <button class="btn-secondary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar inventário
+        </button>
+        <button class="btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo material
+        </button>
+      </div>
+    </header>
 
-      <div *ngIf="tab === 'inventario'" class="tab-content">
-        <div class="stats-row">
-          <div class="stat-card">
-            <span class="label">Itens Ativos em Campo</span>
-            <strong class="value">452</strong>
-          </div>
-          <div class="stat-card alert">
-            <span class="label">Alertas de Reposição</span>
-            <strong class="value">3</strong>
-          </div>
-        </div>
+    <div class="filter-tabs">
+      <button [class.is-active]="tab === 'inventario'" (click)="tab = 'inventario'">
+        Inventário global
+      </button>
+      <button [class.is-active]="tab === 'gabarito'" (click)="tab = 'gabarito'">
+        Gabaritos de estruturas
+      </button>
+    </div>
 
-        <div class="table-container">
-          <table class="vivere-table">
+    <main class="stock-main">
+      <!-- ================== INVENTÁRIO ================== -->
+      <div *ngIf="tab === 'inventario'">
+        <section class="kpi-strip-card">
+          <div class="kpi-cell">
+            <span class="kpi-label">Itens ativos em campo</span>
+            <span class="kpi-value tnum">452</span>
+            <span class="kpi-trend muted">de 1.250 totais</span>
+          </div>
+          <div class="kpi-cell">
+            <span class="kpi-label">Categorias monitoradas</span>
+            <span class="kpi-value tnum">14</span>
+            <span class="kpi-trend muted">3 estruturais, 11 acessórios</span>
+          </div>
+          <div class="kpi-cell">
+            <span class="kpi-label">Alertas de reposição</span>
+            <span class="kpi-value tnum danger">3</span>
+            <span class="kpi-trend danger">Estoque crítico</span>
+          </div>
+          <div class="kpi-cell">
+            <span class="kpi-label">Última auditoria</span>
+            <span class="kpi-value tnum" style="font-size: 18px;">12/04</span>
+            <span class="kpi-trend muted">há 22 dias</span>
+          </div>
+        </section>
+
+        <article class="card no-padding">
+          <header class="card__head">
+            <span class="card__title">Materiais cadastrados</span>
+            <div class="search-mini">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input placeholder="Buscar material..." />
+            </div>
+          </header>
+
+          <table class="data-table data-table--full">
             <thead>
               <tr>
                 <th>Material</th>
-                <th>Unidade</th>
-                <th>Total</th>
-                <th>Em Uso</th>
-                <th>Disponível</th>
+                <th class="cell-center">Unidade</th>
+                <th class="cell-right">Total</th>
+                <th class="cell-right">Em uso</th>
+                <th class="cell-right">Disponível</th>
+                <th>Ocupação</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let item of inventario()">
-                <td><strong>{{ item.nome }}</strong></td>
-                <td>{{ item.unidade }}</td>
-                <td>{{ item.total }}</td>
-                <td>{{ item.emUso }}</td>
-                <td [style.color]="item.disponivel < 10 ? 'red' : 'inherit'" style="font-weight: bold;">
+                <td>
+                  <div class="td-strong">{{ item.nome }}</div>
+                  <div class="td-sub mono">ID: {{ item.id }}</div>
+                </td>
+                <td class="cell-center mono">{{ item.unidade }}</td>
+                <td class="cell-right mono">{{ item.total }}</td>
+                <td class="cell-right mono">{{ item.emUso }}</td>
+                <td class="cell-right mono"
+                    [style.color]="item.disponivel < 10 ? 'var(--status-danger)' : 'var(--text-primary)'"
+                    [style.fontWeight]="item.disponivel < 10 ? '600' : '500'">
                   {{ item.disponivel }}
                 </td>
+                <td style="width: 160px;">
+                  <div class="progress">
+                    <div class="progress__bar"
+                         [style.width.%]="(item.emUso / item.total) * 100"
+                         [class.is-danger]="item.disponivel < 10"></div>
+                  </div>
+                  <span class="progress__text mono">{{ ((item.emUso / item.total) * 100) | number:'1.0-0' }}%</span>
+                </td>
                 <td>
-                  <span class="status-pill" [class.low]="item.disponivel < 10">
-                    {{ item.disponivel < 10 ? 'Estoque Baixo' : 'Estável' }}
+                  <span class="badge" [ngClass]="item.disponivel < 10 ? 'badge--danger' : 'badge--success'">
+                    {{ item.disponivel < 10 ? 'Estoque baixo' : 'Estável' }}
                   </span>
                 </td>
               </tr>
             </tbody>
           </table>
-        </div>
+        </article>
       </div>
 
-      <div *ngIf="tab === 'gabarito'" class="tab-content">
-        <div class="gabarito-grid">
-          <div class="estrutura-sidebar">
-            <div style="padding: 10px; font-size: 0.7rem; color: #999; font-weight: bold;">SELECIONE O GABARITO</div>
-            <button *ngFor="let est of gabaritos()" 
-                    (click)="selecionarEstrutura(est)"
-                    [class.selected]="estSelecionada?.id === est.id">
-              🏗️ {{ est.nome }}
+      <!-- ================== GABARITOS ================== -->
+      <div *ngIf="tab === 'gabarito'" class="gabarito-grid">
+        <aside class="gabarito-sidebar card">
+          <header class="card__head">
+            <span class="card__title">Selecione o gabarito</span>
+          </header>
+          <div class="gabarito-list">
+            <button *ngFor="let est of gabaritos()"
+                    class="gabarito-item"
+                    [class.is-selected]="estSelecionada?.id === est.id"
+                    (click)="selecionarEstrutura(est)">
+              <div class="gabarito-item__id mono">{{ est.id }}</div>
+              <div class="gabarito-item__name">{{ est.nome }}</div>
+              <svg class="gabarito-item__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
-            <button class="btn-add-est">+ Nova Estrutura</button>
-          </div>
 
-          <div class="estrutura-detalhes" *ngIf="estSelecionada">
-            <h3>Composição: {{ estSelecionada.nome }}</h3>
-            <p class="hint">Abaixo estão os materiais que compõem 1 unidade desta estrutura. Estes dados alimentam a Ordem de Serviço automaticamente.</p>
-            
-            <table class="vivere-table mini">
-              <thead>
-                <tr>
-                  <th>Material Necessário</th>
-                  <th>Quantidade</th>
-                  <th>Unidade</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let mat of estSelecionada.materiais">
-                  <td>{{ mat.nome }}</td>
-                  <td><strong>{{ mat.qtdNecessaria }}</strong></td>
-                  <td>{{ mat.unidade }}</td>
-                </tr>
-              </tbody>
-            </table>
-            
-            <div style="margin-top: 25px; display: flex; gap: 10px;">
-              <button class="btn-primary">Editar Composição</button>
-              <button class="btn-secondary">Duplicar Gabarito</button>
-            </div>
+            <button class="gabarito-item gabarito-item--add">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Nova estrutura</span>
+            </button>
           </div>
+        </aside>
 
-          <div class="estrutura-detalhes empty" *ngIf="!estSelecionada">
-            <div style="text-align: center; color: #bbb; padding-top: 100px;">
-              <span style="font-size: 3rem;">🏗️</span>
-              <p>Selecione uma estrutura ao lado para ver sua composição de materiais.</p>
+        <article class="card gabarito-detail" *ngIf="estSelecionada; else emptyDetail">
+          <header class="card__head">
+            <div>
+              <span class="detail-eyebrow mono">{{ estSelecionada.id }}</span>
+              <h2 class="detail-title">{{ estSelecionada.nome }}</h2>
             </div>
-          </div>
-        </div>
+            <div class="detail-actions">
+              <button class="btn-secondary">Duplicar</button>
+              <button class="btn-primary">Editar composição</button>
+            </div>
+          </header>
+
+          <p class="detail-hint">
+            Materiais que compõem <strong>1 unidade</strong> desta estrutura. Estes dados alimentam a OS automaticamente.
+          </p>
+
+          <table class="data-table inline-table">
+            <thead>
+              <tr>
+                <th>Material necessário</th>
+                <th class="cell-right">Quantidade</th>
+                <th class="cell-center">Unidade</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let mat of estSelecionada.materiais">
+                <td class="td-strong">{{ mat.nome }}</td>
+                <td class="cell-right mono">{{ mat.qtdNecessaria }}</td>
+                <td class="cell-center mono td-muted">{{ mat.unidade }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+
+        <ng-template #emptyDetail>
+          <article class="card gabarito-detail">
+            <div class="empty-block">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              <p>Selecione um gabarito ao lado</p>
+              <span>A composição de materiais aparecerá aqui.</span>
+            </div>
+          </article>
+        </ng-template>
       </div>
-    </div>
+    </main>
   `,
   styles: [`
-    .stock-container { padding: 30px; background: #f4f4f4; min-height: calc(100vh - 70px); font-family: 'Segoe UI', sans-serif; }
-    .stock-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-    
-    .tab-menu { display: flex; gap: 5px; background: #e0e0e0; padding: 5px; border-radius: 8px; }
-    .tab-menu button { padding: 10px 20px; border: none; background: transparent; cursor: pointer; border-radius: 6px; font-weight: bold; color: #666; transition: 0.2s; }
-    .tab-menu button.active { background: white; color: var(--vivere-black); shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .page-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 18px 28px; background: var(--surface); border-bottom: 1px solid var(--border);
+    }
+    .eyebrow { display: block; font-size: 11px; font-weight: 600; letter-spacing: 1.2px; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 3px; }
+    .page-header__title h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; color: var(--text-strong); margin: 0; }
+    .page-header__title .subtitle { margin: 4px 0 0; font-size: 13px; color: var(--text-secondary); }
+    .page-header__right { display: flex; gap: 8px; }
 
-    .stats-row { display: flex; gap: 20px; margin-bottom: 25px; }
-    .stat-card { background: white; padding: 20px; border-radius: 12px; flex: 1; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-bottom: 4px solid #ddd; }
-    .stat-card.alert { border-bottom-color: var(--vivere-orange); }
-    .stat-card .label { color: #888; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
-    .stat-card .value { display: block; font-size: 2rem; margin-top: 10px; color: var(--vivere-black); }
+    .btn-primary, .btn-secondary {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 13px; border-radius: var(--radius);
+      font-size: 13px; font-weight: 500;
+      cursor: pointer;
+      transition: all var(--duration) var(--ease);
+    }
+    .btn-primary svg, .btn-secondary svg { width: 14px; height: 14px; }
+    .btn-primary { background: var(--vivere-orange); color: white; border: 1px solid var(--vivere-orange); }
+    .btn-primary:hover { background: var(--vivere-orange-hover); border-color: var(--vivere-orange-hover); }
+    .btn-secondary { background: var(--surface); color: var(--text-primary); border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--border-strong); background: var(--surface-hover); }
 
-    .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    .vivere-table { width: 100%; border-collapse: collapse; }
-    .vivere-table th { background: #fafafa; padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: #999; border-bottom: 1px solid #eee; }
-    .vivere-table td { padding: 15px; border-bottom: 1px solid #f9f9f9; font-size: 0.9rem; }
+    /* TABS */
+    .filter-tabs {
+      display: flex; gap: 0;
+      padding: 0 28px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .filter-tabs button {
+      padding: 12px 14px;
+      background: transparent;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      transition: color var(--duration) var(--ease), border-color var(--duration) var(--ease);
+    }
+    .filter-tabs button:hover { color: var(--text-primary); }
+    .filter-tabs button.is-active { color: var(--text-strong); border-bottom-color: var(--vivere-orange); }
 
-    .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; background: #e8f5e9; color: #2ecc71; }
-    .status-pill.low { background: #ffebee; color: #e74c3c; }
+    /* MAIN */
+    .stock-main {
+      padding: 20px 28px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
 
-    .gabarito-grid { display: grid; grid-template-columns: 280px 1fr; gap: 25px; min-height: 500px; }
-    .estrutura-sidebar { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-    .estrutura-sidebar button { width: 100%; text-align: left; padding: 15px; margin-bottom: 8px; border: 1px solid #f0f0f0; background: #fff; cursor: pointer; border-radius: 8px; transition: 0.2s; font-weight: 500; color: #444; }
-    .estrutura-sidebar button:hover { border-color: var(--vivere-orange); background: #fffaf5; }
-    .estrutura-sidebar button.selected { border-color: var(--vivere-orange); background: var(--vivere-orange); color: white; }
-    
-    .btn-add-est { border: 2px dashed #ddd !important; color: #999 !important; text-align: center !important; margin-top: 10px; }
-    .btn-add-est:hover { border-color: var(--vivere-orange) !important; color: var(--vivere-orange) !important; }
+    /* KPI STRIP */
+    .kpi-strip-card {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .kpi-cell {
+      padding: 14px 18px;
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label { font-size: 11px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-tertiary); }
+    .kpi-value { font-size: 24px; font-weight: 700; color: var(--text-strong); letter-spacing: -0.5px; line-height: 1.1; }
+    .kpi-value.danger { color: var(--status-danger); }
+    .kpi-trend { font-size: 11.5px; font-weight: 500; }
+    .kpi-trend.danger { color: var(--status-danger); }
+    .kpi-trend.muted { color: var(--text-tertiary); }
 
-    .estrutura-detalhes { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-    .hint { font-size: 0.85rem; color: #888; margin-bottom: 25px; line-height: 1.5; }
-    
-    .btn-primary { background: var(--vivere-black); color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .btn-secondary { background: #eee; color: #444; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    /* CARD */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+    .card.no-padding { padding: 0; overflow: hidden; }
+    .card__head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .card__title {
+      font-size: 12px; font-weight: 600; letter-spacing: 0.4px;
+      text-transform: uppercase; color: var(--text-secondary);
+    }
+
+    .search-mini {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      transition: border-color var(--duration) var(--ease);
+    }
+    .search-mini:focus-within { border-color: var(--vivere-orange); box-shadow: 0 0 0 3px rgba(255,102,0,0.10); }
+    .search-mini svg { width: 13px; height: 13px; color: var(--text-tertiary); }
+    .search-mini input {
+      border: 0; outline: 0; background: transparent;
+      font-size: 12.5px;
+      width: 180px;
+      color: var(--text-primary);
+    }
+    .search-mini input::placeholder { color: var(--text-muted); }
+
+    /* TABLE */
+    .data-table--full { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table--full th {
+      padding: 10px 14px;
+      background: var(--surface-sunken);
+      text-align: left;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      border-bottom: 1px solid var(--border);
+    }
+    .data-table--full td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    .data-table--full tbody tr { transition: background var(--duration) var(--ease); }
+    .data-table--full tbody tr:hover { background: var(--surface-hover); }
+    .data-table--full tbody tr:last-child td { border-bottom: 0; }
+
+    .cell-right { text-align: right; }
+    .cell-center { text-align: center; }
+    .td-strong { font-weight: 500; color: var(--text-primary); }
+    .td-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+    .td-muted { color: var(--text-tertiary); }
+    .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 12.5px; }
+
+    /* PROGRESS */
+    .progress {
+      display: inline-block;
+      width: 110px; height: 6px;
+      background: var(--surface-sunken);
+      border-radius: 3px;
+      overflow: hidden;
+      vertical-align: middle;
+    }
+    .progress__bar {
+      height: 100%;
+      background: var(--vivere-orange);
+      transition: width var(--duration-slow) var(--ease);
+    }
+    .progress__bar.is-danger { background: var(--status-danger); }
+    .progress__text {
+      display: inline-block;
+      margin-left: 8px;
+      font-size: 11.5px;
+      color: var(--text-tertiary);
+      vertical-align: middle;
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-block; padding: 2px 8px;
+      font-size: 10.5px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase;
+      border-radius: var(--radius-sm); border: 1px solid;
+    }
+    .badge--danger { color: var(--status-danger); background: var(--status-danger-bg); border-color: var(--status-danger-border); }
+    .badge--success { color: var(--status-success); background: var(--status-success-bg); border-color: var(--status-success-border); }
+
+    /* ============ GABARITOS ============ */
+    .gabarito-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .gabarito-sidebar { padding: 0; }
+    .gabarito-list { padding: 8px; display: flex; flex-direction: column; gap: 2px; }
+
+    .gabarito-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-align: left;
+      transition: all var(--duration) var(--ease);
+      position: relative;
+    }
+    .gabarito-item__id {
+      padding: 2px 7px;
+      background: var(--surface-sunken);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .gabarito-item__name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .gabarito-item__chevron {
+      width: 14px; height: 14px;
+      color: var(--text-muted);
+      transition: transform var(--duration) var(--ease);
+    }
+    .gabarito-item:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-subtle);
+    }
+    .gabarito-item:hover .gabarito-item__chevron { transform: translateX(2px); color: var(--text-secondary); }
+    .gabarito-item.is-selected {
+      background: var(--vivere-orange-soft);
+      border-color: var(--vivere-orange-border);
+    }
+    .gabarito-item.is-selected::before {
+      content: '';
+      position: absolute;
+      left: -1px; top: 8px; bottom: 8px;
+      width: 2px;
+      background: var(--vivere-orange);
+      border-radius: 0 2px 2px 0;
+    }
+    .gabarito-item.is-selected .gabarito-item__id {
+      background: var(--surface);
+      border-color: var(--vivere-orange-border);
+      color: var(--vivere-orange);
+    }
+    .gabarito-item.is-selected .gabarito-item__chevron { color: var(--vivere-orange); }
+
+    .gabarito-item--add {
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px;
+      margin-top: 6px;
+      padding: 10px;
+      border: 1px dashed var(--border-strong);
+      color: var(--text-tertiary);
+      font-size: 12.5px;
+      font-weight: 500;
+    }
+    .gabarito-item--add svg { width: 14px; height: 14px; }
+    .gabarito-item--add:hover {
+      border-color: var(--vivere-orange);
+      border-style: dashed;
+      background: var(--vivere-orange-soft);
+      color: var(--vivere-orange);
+    }
+
+    /* GABARITO DETAIL */
+    .gabarito-detail { padding: 0; }
+    .gabarito-detail .card__head {
+      align-items: flex-start;
+      padding: 16px;
+    }
+    .detail-eyebrow {
+      display: inline-block;
+      padding: 2px 7px;
+      background: var(--vivere-orange-soft);
+      border: 1px solid var(--vivere-orange-border);
+      color: var(--vivere-orange);
+      font-size: 10.5px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      margin-bottom: 5px;
+    }
+    .detail-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-strong);
+      letter-spacing: -0.2px;
+    }
+    .detail-actions { display: flex; gap: 8px; }
+    .detail-hint {
+      margin: 0;
+      padding: 12px 16px;
+      background: var(--surface-sunken);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .detail-hint strong { color: var(--text-primary); font-weight: 600; }
+
+    .inline-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .inline-table th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .inline-table td {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .inline-table tr:last-child td { border-bottom: 0; }
+
+    .empty-block {
+      padding: 80px 20px;
+      text-align: center;
+      color: var(--text-tertiary);
+    }
+    .empty-block svg {
+      width: 36px; height: 36px;
+      color: var(--text-muted);
+      padding: 12px;
+      background: var(--surface-sunken);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      box-sizing: content-box;
+      margin: 0 auto 14px;
+      display: block;
+    }
+    .empty-block p { margin: 0 0 4px; font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .empty-block span { font-size: 12.5px; }
+
+    @media (max-width: 1100px) {
+      .gabarito-grid { grid-template-columns: 1fr; }
+      .kpi-strip-card { grid-template-columns: repeat(2, 1fr); }
+      .kpi-cell:nth-child(2) { border-right: 0; }
+      .kpi-cell:nth-child(1), .kpi-cell:nth-child(2) { border-bottom: 1px solid var(--border); }
+    }
   `]
 })
 export class StockComponent {
@@ -173,9 +543,9 @@ export class StockComponent {
   ]);
 
   gabaritos = signal<EstruturaGabarito[]>([
-    { 
-      id: 'T10', 
-      nome: 'TENDA 10X10 PIRAMIDAL', 
+    {
+      id: 'T10',
+      nome: 'TENDA 10X10 PIRAMIDAL',
       materiais: [
         { nome: 'Lona de Cobertura 10x10', qtdNecessaria: 1, unidade: 'UN' },
         { nome: 'Cabo de Aço Estirante', qtdNecessaria: 4, unidade: 'UN' },
@@ -183,9 +553,9 @@ export class StockComponent {
         { nome: 'Treliça de Sustentação', qtdNecessaria: 4, unidade: 'UN' }
       ]
     },
-    { 
-      id: 'P43', 
-      nome: 'PALCO PRATICÁVEL 4X3M', 
+    {
+      id: 'P43',
+      nome: 'PALCO PRATICÁVEL 4X3M',
       materiais: [
         { nome: 'Praticável 2x1m Telescópico', qtdNecessaria: 6, unidade: 'UN' },
         { nome: 'Escada de Acesso 3 Degraus', qtdNecessaria: 1, unidade: 'UN' },

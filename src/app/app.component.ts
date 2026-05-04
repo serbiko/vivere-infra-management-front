@@ -8,37 +8,207 @@ import { UserStore } from './core/stores/user.store';
   standalone: true,
   imports: [CommonModule, RouterOutlet, RouterModule],
   template: `
-    <div style="display: flex; height: 100vh; overflow: hidden; background: #f8f9fa;">
-      
-      <aside *ngIf="!isLoginPage()" style="width: 260px; background: #1a1a1a; color: white; display: flex; flex-direction: column; z-index: 100;">
-        <div style="padding: 30px 20px; text-align: center; border-bottom: 1px solid #333;">
-          <h1 style="color: #ff6600; margin: 0; font-size: 1.8rem; letter-spacing: 2px; cursor:pointer" (click)="router.navigate(['/dashboard'])">VIVERE</h1>
-          <small style="color: #666; letter-spacing: 1px;">INFRA MANAGEMENT</small>
+    <div class="app-shell" [class.is-auth-screen]="isLoginPage()">
+      <aside class="sidebar" *ngIf="!isLoginPage()">
+        <div class="sidebar__brand" (click)="router.navigate(['/dashboard'])">
+          <div class="brand-mark">
+            <span class="brand-dot"></span>
+            <span class="brand-name">VIVERE</span>
+          </div>
+          <span class="brand-sub">INFRA MANAGEMENT</span>
         </div>
 
-        <nav style="flex: 1; padding: 20px 0;">
-          <ul style="list-style: none; padding: 0; margin: 0;">
-            <li class="nav-item" routerLink="/dashboard" routerLinkActive="active">📊 Dashboard</li>
-            <li class="nav-item" routerLink="/eventos" routerLinkActive="active">📅 Eventos</li>
-            <li class="nav-item" routerLink="/ordens" routerLinkActive="active">📝 Ordens de Serviço</li>
-            <li class="nav-item" routerLink="/estoque" routerLinkActive="active">📦 Estoque</li>
-          </ul>
+        <nav class="sidebar__nav">
+          <span class="nav-section-title">Operação</span>
+          <a class="nav-item" routerLink="/dashboard" routerLinkActive="is-active">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/>
+              <rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>
+            </svg>
+            <span>Dashboard</span>
+          </a>
+          <a class="nav-item" routerLink="/eventos" routerLinkActive="is-active">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+            </svg>
+            <span>Eventos</span>
+          </a>
+          <a class="nav-item" routerLink="/ordens" routerLinkActive="is-active">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/>
+            </svg>
+            <span>Ordens de Serviço</span>
+          </a>
+          <a class="nav-item" routerLink="/estoque" routerLinkActive="is-active">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+            <span>Estoque</span>
+          </a>
         </nav>
 
-        <div style="padding: 20px; border-top: 1px solid #333;">
-          <button (click)="logout()" class="btn-logout">Sair do Sistema</button>
+        <div class="sidebar__footer">
+          <button class="btn-logout" (click)="logout()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            <span>Sair do sistema</span>
+          </button>
         </div>
       </aside>
 
-      <main style="flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
+      <main class="main-area">
         <router-outlet></router-outlet>
       </main>
     </div>
   `,
   styles: [`
-    .nav-item { padding: 15px 25px; cursor: pointer; transition: 0.3s; border-left: 4px solid transparent; color: #bbb; font-weight: 500; text-decoration: none; display: block; }
-    .nav-item:hover, .active { background: #252525; color: #ff6600 !important; border-left: 4px solid #ff6600; }
-    .btn-logout { width: 100%; padding: 12px; background: #333; color: #ff4d4d; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .app-shell {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg-app);
+    }
+    .app-shell.is-auth-screen { background: var(--surface); }
+
+    /* ============ SIDEBAR ============ */
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      background: var(--sidebar-bg);
+      color: var(--sidebar-text);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--sidebar-border);
+    }
+
+    .sidebar__brand {
+      padding: 20px 20px 18px;
+      border-bottom: 1px solid var(--sidebar-border);
+      cursor: pointer;
+      user-select: none;
+    }
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--vivere-orange);
+      border-radius: 2px;
+      box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.18);
+    }
+    .brand-name {
+      color: var(--sidebar-text-strong);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+    }
+    .brand-sub {
+      display: block;
+      margin-top: 6px;
+      margin-left: 18px;
+      font-size: 9.5px;
+      font-weight: 600;
+      letter-spacing: 1.4px;
+      color: #5e5e5e;
+    }
+
+    .sidebar__nav {
+      flex: 1;
+      padding: 16px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      overflow-y: auto;
+    }
+    .nav-section-title {
+      padding: 8px 12px 6px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #5a5a5a;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 9px 12px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--sidebar-text);
+      text-decoration: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      position: relative;
+      transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+    }
+    .nav-icon {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+      stroke: currentColor;
+    }
+    .nav-item:hover {
+      background: var(--sidebar-bg-hover);
+      color: #d4d4d4;
+    }
+    .nav-item.is-active {
+      background: var(--sidebar-bg-active);
+      color: var(--sidebar-text-strong);
+    }
+    .nav-item.is-active::before {
+      content: '';
+      position: absolute;
+      left: -10px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: var(--vivere-orange);
+      border-radius: 0 2px 2px 0;
+    }
+    .nav-item.is-active .nav-icon { color: var(--vivere-orange); }
+
+    .sidebar__footer {
+      padding: 12px;
+      border-top: 1px solid var(--sidebar-border);
+    }
+    .btn-logout {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      background: transparent;
+      color: var(--sidebar-text);
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all var(--duration) var(--ease);
+    }
+    .btn-logout svg { width: 16px; height: 16px; }
+    .btn-logout:hover {
+      background: var(--sidebar-bg-hover);
+      color: #ffaaaa;
+      border-color: var(--sidebar-border);
+    }
+
+    /* ============ MAIN ============ */
+    .main-area {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
   `]
 })
 export class AppComponent {

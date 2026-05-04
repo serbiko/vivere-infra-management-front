@@ -21,13 +21,14 @@ export interface VivereEvent {
 export class EventService {
   private http = inject(HttpClient);
   // Verifique se a porta do seu colega de backend é realmente a 3000
-  private apiUrl = 'http://localhost:8080/events'; 
+  private apiUrl = 'http://localhost:8081/events'; 
 
   getEvents(): Observable<VivereEvent[]> {
     return this.http.get<VivereEvent[]>(this.apiUrl);
   }
 
   createEvent(event: any): Observable<any> {
+    
     return this.http.post(this.apiUrl, event);
   }
 
