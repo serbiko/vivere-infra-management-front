@@ -12,7 +12,6 @@ import { HttpErrorResponse } from '@angular/common/http';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="auth-page">
-      <!-- LADO ESQUERDO: BRAND -->
       <aside class="auth-brand">
         <div class="brand-grid"></div>
         <div class="brand-content">
@@ -47,7 +46,6 @@ import { HttpErrorResponse } from '@angular/common/http';
         </div>
       </aside>
 
-      <!-- LADO DIREITO: FORM -->
       <main class="auth-main">
         <div class="auth-card">
 
@@ -66,6 +64,16 @@ import { HttpErrorResponse } from '@angular/common/http';
               <label>E-mail corporativo</label>
               <input [(ngModel)]="userData.email" type="email" placeholder="voce@empresa.com" />
             </div>
+            
+            <div class="field">
+              <label>Cargo / Departamento</label>
+              <select [(ngModel)]="userData.role" class="select-role">
+                <option value="PRODUCAO">Equipe de Produção (Eventos)</option>
+                <option value="GALPAO">Equipe de Galpão (Estoque)</option>
+                <option value="ADMIN">Administrador Geral</option>
+              </select>
+            </div>
+
             <div class="field">
               <label>Senha <span class="hint">mínimo 6 caracteres</span></label>
               <input [(ngModel)]="userData.password" type="password" placeholder="••••••••" />
@@ -287,7 +295,9 @@ import { HttpErrorResponse } from '@angular/common/http';
       color: var(--text-tertiary);
       font-size: 11px;
     }
-    .field input {
+    
+    /* Input & Select */
+    .field input, .select-role {
       padding: 10px 12px;
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -296,9 +306,10 @@ import { HttpErrorResponse } from '@angular/common/http';
       color: var(--text-primary);
       transition: border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
     }
+    .select-role { cursor: pointer; }
     .field input::placeholder { color: var(--text-muted); }
-    .field input:hover { border-color: var(--border-strong); }
-    .field input:focus {
+    .field input:hover, .select-role:hover { border-color: var(--border-strong); }
+    .field input:focus, .select-role:focus {
       outline: none;
       border-color: var(--vivere-orange);
       box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.12);
@@ -366,7 +377,6 @@ import { HttpErrorResponse } from '@angular/common/http';
     }
     .link-row a:hover { text-decoration: underline; }
 
-    /* Mobile collapse */
     @media (max-width: 900px) {
       .auth-page { grid-template-columns: 1fr; }
       .auth-brand { padding: 32px; }
@@ -381,7 +391,10 @@ export class LoginComponent {
   private router = inject(Router);
 
   step = signal<'login' | 'register' | 'otp'>('login');
-  userData = { name: '', email: '', password: '' };
+  
+  // A propriedade 'role' está agora inicializada na declaração
+  userData = { name: '', email: '', password: '', role: 'PRODUCAO' };
+  
   otpCode = '';
   errorMessage = '';
   year = new Date().getFullYear();
@@ -404,17 +417,19 @@ export class LoginComponent {
   }
 
   verifyOtp() {
-    this.authService.verifyOtp(this.userData.email, this.otpCode)
-      .subscribe(() => this.step.set('login'));
+    this.authService.verifyOtp(this.userData.email, this.otpCode).subscribe({
+      next: () => this.step.set('login'),
+      error: () => this.errorMessage = 'Código inválido ou expirado.'
+    });
   }
 
   login() {
     this.authService.login(this.userData.email, this.userData.password).subscribe({
-      next: (tokens) => {
+      next: (tokens: any) => {
         this.userStore.setTokens(tokens);
         this.router.navigate(['/dashboard']);
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Erro detalhado no login:', err);
         alert('Falha no login: verifique suas credenciais.');
       }

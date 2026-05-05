@@ -86,7 +86,6 @@ import { Router } from '@angular/router';
       </div>
     </main>
 
-    <!-- MODAL -->
     <div *ngIf="editForm" class="modal-overlay" (click)="editForm = null">
       <div class="modal" (click)="$event.stopPropagation()">
         <header class="modal__head">
@@ -123,8 +122,8 @@ import { Router } from '@angular/router';
           </div>
 
           <div class="field">
-            <label>Observações da OS / carga</label>
-            <textarea [(ngModel)]="editForm.description" rows="4"></textarea>
+            <label>Observações da OS / carga (Apenas Local)</label>
+            <textarea [(ngModel)]="editForm.description" rows="4" placeholder="O backend ainda não salva este campo."></textarea>
           </div>
         </div>
 
@@ -416,10 +415,17 @@ export class EventListComponent implements OnInit {
 
   salvarAlteracoes() {
     if (this.editForm && this.editForm.id) {
-      if (this.editForm.startDate && !this.editForm.startDate.includes('T')) {
-        this.editForm.startDate = new Date(this.editForm.startDate).toISOString();
-      }
-      this.eventService.updateEvent(this.editForm.id, this.editForm).subscribe({
+      
+      let startStr = this.editForm.startDate as string;
+      if (!startStr.includes('T')) startStr += 'T12:00:00';
+
+      const payloadLimpo = {
+        name: this.editForm.name,
+        status: this.editForm.status,
+        startDate: new Date(startStr).toISOString()
+      };
+
+      this.eventService.updateEvent(this.editForm.id, payloadLimpo).subscribe({
         next: () => {
           alert('✅ Banco de Dados atualizado com sucesso!');
           this.editForm = null;
