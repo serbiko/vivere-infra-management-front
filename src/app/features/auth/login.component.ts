@@ -12,376 +12,419 @@ import { HttpErrorResponse } from '@angular/common/http';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="auth-page">
-      <aside class="auth-brand">
-        <div class="brand-grid"></div>
-        <div class="brand-content">
-          <div class="brand-tag">
-            <span class="brand-dot"></span>
-            <span>VIVERE • INFRA MANAGEMENT</span>
-          </div>
-          <h1 class="brand-title">
-            Operação de eventos<br>
-            <span class="accent">controlada na palma da mão.</span>
-          </h1>
-          <p class="brand-desc">
-            Gestão de estoque, ordens de serviço e logística de montagem em uma plataforma única.
-          </p>
+      
+      <div class="abstract-bg">
+        <div class="glow-shape orange-glow"></div>
+        <div class="glow-shape gray-glow"></div>
+      </div>
 
-          <ul class="brand-features">
-            <li>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Inventário sincronizado em tempo real
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Emissão de OS rastreável por evento
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Geolocalização de cargas e equipes
-            </li>
-          </ul>
-
-          <div class="brand-footer">© {{ year }} Vivere — Todos os direitos reservados.</div>
-        </div>
-      </aside>
-
-      <main class="auth-main">
-        <div class="auth-card">
-
-          @if (step() === 'register') {
-            <header class="auth-head">
-              <span class="auth-eyebrow">CADASTRO</span>
-              <h2>Criar uma conta</h2>
-              <p>Preencha os dados para acessar o sistema.</p>
-            </header>
-
-            <div class="field">
-              <label>Nome completo</label>
-              <input [(ngModel)]="userData.name" placeholder="Ex: André Ribeiro" />
+      <div class="auth-wrapper">
+        
+        <aside class="auth-sidebar">
+          <div class="sidebar-content">
+            
+            <div class="brand-container">
+              <img src="vivere_logo.png" alt="Vivere Entretenimento" class="brand-logo" />
             </div>
-            <div class="field">
-              <label>E-mail corporativo</label>
-              <input [(ngModel)]="userData.email" type="email" placeholder="voce@empresa.com" />
+
+            <div class="abstract-graphic">
+              <div class="wire-box w-100 tall"></div>
+              
+              <div class="wire-row">
+                <div class="wire-box w-30 highlight"></div>
+                <div class="wire-box w-70"></div>
+              </div>
+
+              <div class="wire-row">
+                <div class="wire-circle"></div>
+                <div class="wire-box w-50"></div>
+                <div class="wire-box w-20"></div>
+              </div>
+
+              <div class="wire-row">
+                <div class="wire-box w-60"></div>
+                <div class="wire-box w-40 highlight-soft"></div>
+              </div>
+
+              <div class="wire-tracks">
+                <div class="track"><div class="track-fill w-80"></div></div>
+                <div class="track"><div class="track-fill w-40 highlight-fill"></div></div>
+                <div class="track"><div class="track-fill w-60"></div></div>
+              </div>
+
+              <div class="wire-row footer-wires">
+                <div class="wire-box w-20"></div>
+                <div class="wire-box w-80"></div>
+              </div>
             </div>
             
-            <div class="field">
-              <label>Cargo / Departamento</label>
-              <select [(ngModel)]="userData.role" class="select-role">
-                <option value="PRODUCAO">Equipe de Produção (Eventos)</option>
-                <option value="GALPAO">Equipe de Galpão (Estoque)</option>
-                <option value="ADMIN">Administrador Geral</option>
-              </select>
-            </div>
+          </div>
+        </aside>
 
-            <div class="field">
-              <label>Senha <span class="hint">mínimo 6 caracteres</span></label>
-              <input [(ngModel)]="userData.password" type="password" placeholder="••••••••" />
-            </div>
+        <main class="auth-main">
+          <div class="auth-card">
+            @if (step() === 'register') {
+              <div class="auth-head">
+                <h2>Novo Cadastro</h2>
+                <p>Configure o acesso para um novo colaborador no sistema.</p>
+              </div>
 
-            <p *ngIf="errorMessage" class="msg-error">{{ errorMessage }}</p>
+              <div class="field">
+                <label>Nome completo</label>
+                <input [(ngModel)]="userData.name" placeholder="Ex: André Ribeiro" />
+              </div>
+              
+              <div class="field">
+                <label>E-mail corporativo</label>
+                <input [(ngModel)]="userData.email" type="email" placeholder="voce@empresa.com" />
+              </div>
+              
+              <div class="field">
+                <label>Departamento de Atuação</label>
+                <select [(ngModel)]="userData.role" class="select-role">
+                  <option value="PRODUCAO">Equipe de Produção (Eventos)</option>
+                  <option value="GALPAO">Equipe de Galpão (Estoque)</option>
+                  <option value="ADMIN">Administrador Geral</option>
+                </select>
+              </div>
 
-            <button
-              class="btn-primary"
-              (click)="register()"
-              [disabled]="!userData.name || !userData.email || userData.password.length < 6">
-              Criar conta
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
+              <div class="field">
+                <label>Senha de Acesso <span class="hint">mínimo 6 caracteres</span></label>
+                <input [(ngModel)]="userData.password" type="password" placeholder="••••••••" />
+              </div>
 
-            <p class="link-row">Já tem conta? <a (click)="mudarPasso('login')">Entrar</a></p>
-          }
+              <p *ngIf="errorMessage" class="msg-error">{{ errorMessage }}</p>
 
-          @else if (step() === 'otp') {
-            <header class="auth-head">
-              <span class="auth-eyebrow">VERIFICAÇÃO</span>
-              <h2>Confirme seu e-mail</h2>
-              <p>Enviamos um código de 6 dígitos para <strong>{{ userData.email }}</strong>.</p>
-            </header>
+              <button class="btn-primary" (click)="register()" [disabled]="!userData.name || !userData.email || userData.password.length < 6">
+                Concluir Registro
+              </button>
 
-            <div class="field">
-              <label>Código de verificação</label>
-              <input class="otp-input mono" [(ngModel)]="otpCode" placeholder="000000" maxlength="6" />
-            </div>
+              <div class="auth-actions">
+                <button class="btn-link" (click)="mudarPasso('login')">Já possui conta? Entrar agora</button>
+              </div>
+            }
 
-            <button class="btn-primary" (click)="verifyOtp()">
-              Verificar código
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
+            @else if (step() === 'otp') {
+              <div class="auth-head">
+                <h2>Verificação em Duas Etapas</h2>
+                <p>Para sua segurança, insira o código enviado para <strong>{{ userData.email }}</strong></p>
+              </div>
 
-            <p class="link-row"><a (click)="mudarPasso('login')">Voltar para login</a></p>
-          }
+              <div class="field">
+                <label>Código de Autenticação</label>
+                <input class="otp-input mono" [(ngModel)]="otpCode" placeholder="000000" maxlength="6" />
+              </div>
 
-          @else {
-            <header class="auth-head">
-              <span class="auth-eyebrow">ACESSO</span>
-              <h2>Entrar no sistema</h2>
-              <p>Use suas credenciais corporativas para continuar.</p>
-            </header>
+              <button class="btn-primary" (click)="verifyOtp()">
+                Validar Identidade
+              </button>
 
-            <div class="field">
-              <label>E-mail</label>
-              <input [(ngModel)]="userData.email" placeholder="voce@empresa.com" />
-            </div>
-            <div class="field">
-              <label>Senha</label>
-              <input [(ngModel)]="userData.password" type="password" placeholder="••••••••" />
-            </div>
+              <div class="auth-actions">
+                <button class="btn-link" (click)="mudarPasso('login')">Cancelar operação</button>
+              </div>
+            }
 
-            <button class="btn-primary" (click)="login()">
-              Entrar
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
+            @else {
+              <div class="auth-head">
+                <h2>Acesso Restrito</h2>
+                <p>Identifique-se para gerenciar os recursos de infraestrutura.</p>
+              </div>
 
-            <p class="link-row">Não tem conta? <a (click)="mudarPasso('register')">Cadastre-se</a></p>
-          }
-        </div>
-      </main>
+              <div class="field">
+                <label>E-mail corporativo</label>
+                <input [(ngModel)]="userData.email" placeholder="nome@vivere.com" />
+              </div>
+              
+              <div class="field">
+                <label>Senha</label>
+                <input [(ngModel)]="userData.password" type="password" placeholder="••••••••" />
+              </div>
+
+              <button class="btn-primary" (click)="login()">
+                Acessar Plataforma
+              </button>
+
+              <div class="auth-actions">
+                <button class="btn-link" (click)="mudarPasso('register')">Solicitar novo acesso ao administrador</button>
+              </div>
+            }
+            
+            <footer class="card-footer">
+              Sistema de Gestão Vivere
+            </footer>
+          </div>
+        </main>
+
+      </div>
     </div>
   `,
   styles: [`
     .auth-page {
-      display: grid;
-      grid-template-columns: 5fr 6fr;
+      position: relative;
       min-height: 100vh;
-      background: var(--surface);
-    }
-
-    /* ===== Brand panel (esquerda) ===== */
-    .auth-brand {
-      position: relative;
-      background: var(--sidebar-bg);
-      color: #d4d4d4;
-      padding: 48px 56px;
-      display: flex;
-      flex-direction: column;
+      background-color: #fcfdfe;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       overflow: hidden;
-    }
-    .brand-grid {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-      background-size: 32px 32px;
-      mask-image: radial-gradient(ellipse at 30% 30%, black 0%, transparent 70%);
-      -webkit-mask-image: radial-gradient(ellipse at 30% 30%, black 0%, transparent 70%);
-    }
-    .brand-content {
-      position: relative;
-      z-index: 1;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    .brand-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 6px 11px;
-      align-self: flex-start;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: var(--radius);
-      font-size: 10.5px;
-      font-weight: 600;
-      letter-spacing: 1.2px;
-      color: #cccccc;
-    }
-    .brand-tag .brand-dot {
-      width: 7px; height: 7px;
-      background: var(--vivere-orange);
-      border-radius: 2px;
-      box-shadow: 0 0 0 3px rgba(255,102,0,0.2);
-    }
-    .brand-title {
-      margin: 32px 0 16px;
-      font-size: 38px;
-      line-height: 1.15;
-      font-weight: 700;
-      color: #f5f5f5;
-      letter-spacing: -0.8px;
-    }
-    .brand-title .accent {
-      color: var(--vivere-orange);
-    }
-    .brand-desc {
-      max-width: 420px;
-      color: #9a9a9a;
-      font-size: 14.5px;
-      line-height: 1.55;
-      margin: 0 0 36px;
-    }
-    .brand-features {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .brand-features li {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 13.5px;
-      color: #c4c4c4;
-    }
-    .brand-features svg {
-      width: 16px; height: 16px;
-      padding: 3px;
-      background: rgba(255,102,0,0.12);
-      border: 1px solid rgba(255,102,0,0.25);
-      border-radius: var(--radius-sm);
-      color: var(--vivere-orange);
-      box-sizing: content-box;
-    }
-    .brand-footer {
-      padding-top: 24px;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      font-size: 12px;
-      color: #666;
-    }
-
-    /* ===== Form panel (direita) ===== */
-    .auth-main {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px;
     }
-    .auth-card {
+
+    .abstract-bg {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(#e2e8f0 1.2px, transparent 1.2px);
+      background-size: 30px 30px;
+      z-index: 0;
+    }
+
+    .glow-shape {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: 0;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .orange-glow {
+      width: 600px; height: 600px;
+      background: rgba(255, 102, 0, 0.12);
+      top: -150px; left: -100px;
+    }
+    .gray-glow {
+      width: 700px; height: 700px;
+      background: rgba(203, 213, 225, 0.3);
+      bottom: -250px; right: -50px;
+    }
+
+    /* Wrapper maior para acomodar os campos horizontais */
+    .auth-wrapper {
+      position: relative;
+      z-index: 1;
       width: 100%;
-      max-width: 380px;
+      max-width: 1100px; 
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      align-items: center;
+      padding: 40px;
+      gap: 60px;
+    }
+
+    /* ===== SIDEBAR (ESQUERDA) ===== */
+    .auth-sidebar {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-container {
+      margin-bottom: 50px;
+    }
+
+    .brand-logo {
+      max-width: 300px; /* Logo aumentada */
+      height: auto;
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    /* "Desenhos" Abstratos Detalhados */
+    .abstract-graphic {
       display: flex;
       flex-direction: column;
       gap: 16px;
+      opacity: 0.8;
     }
-    .auth-head { margin-bottom: 8px; }
-    .auth-eyebrow {
-      display: inline-block;
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: 1.6px;
-      color: var(--vivere-orange);
-      margin-bottom: 12px;
+
+    .wire-box {
+      height: 10px;
+      background: #edf2f7;
+      border-radius: 5px;
     }
+    .wire-box.tall { height: 32px; background: #f1f5f9; }
+    .wire-row { display: flex; gap: 16px; align-items: center; }
+    .wire-circle {
+      width: 12px; height: 12px;
+      border: 3px solid #cbd5e1;
+      border-radius: 50%;
+    }
+    
+    .w-100 { width: 100%; }
+    .w-80 { width: 80%; }
+    .w-70 { width: 70%; }
+    .w-60 { width: 60%; }
+    .w-50 { width: 50%; }
+    .w-40 { width: 40%; }
+    .w-30 { width: 30%; }
+    .w-20 { width: 20%; }
+    
+    .highlight { background: rgba(255, 102, 0, 0.3); }
+    .highlight-soft { background: #e2e8f0; border: 1px dashed #cbd5e1; height: 20px; }
+
+    /* Novo painel que substitui os quadradinhos */
+    .wire-tracks {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 10px 0;
+      padding: 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #ffffff;
+    }
+    .track {
+      height: 8px;
+      background: #f1f5f9;
+      border-radius: 4px;
+      width: 100%;
+    }
+    .track-fill {
+      height: 100%;
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .highlight-fill { background: rgba(255, 102, 0, 0.4); }
+
+    .footer-wires { margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 20px; }
+
+    /* ===== CARD (DIREITA) ===== */
+    .auth-main {
+      display: flex;
+      justify-content: center;
+    }
+
+    .auth-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 480px; /* Aumentado horizontalmente */
+      padding: 48px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      border: 1px solid #f1f5f9;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
     .auth-head h2 {
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: -0.4px;
-      color: var(--text-strong);
       margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.5px;
     }
+
     .auth-head p {
       margin: 0;
-      color: var(--text-secondary);
-      font-size: 13.5px;
+      font-size: 15px;
+      color: #64748b;
       line-height: 1.5;
     }
 
-    /* Form fields */
-    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field { display: flex; flex-direction: column; gap: 10px; }
+    
     .field label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-primary);
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
     }
     .field .hint {
+      color: #94a3b8;
       font-weight: 400;
-      color: var(--text-tertiary);
-      font-size: 11px;
-    }
-    
-    /* Input & Select */
-    .field input, .select-role {
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--surface);
-      font-size: 14px;
-      color: var(--text-primary);
-      transition: border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
-    }
-    .select-role { cursor: pointer; }
-    .field input::placeholder { color: var(--text-muted); }
-    .field input:hover, .select-role:hover { border-color: var(--border-strong); }
-    .field input:focus, .select-role:focus {
-      outline: none;
-      border-color: var(--vivere-orange);
-      box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.12);
-    }
-    .otp-input {
-      letter-spacing: 8px;
-      text-align: center;
-      font-size: 20px !important;
-      font-weight: 600;
+      font-size: 11.5px;
     }
 
-    /* Primary button */
+    .field input, .select-role {
+      padding: 14px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 15px;
+      background: #f8fafc;
+      color: #0f172a;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .field input:focus, .select-role:focus {
+      outline: none;
+      background: #ffffff;
+      border-color: #ff6600;
+      box-shadow: 0 0 0 4px rgba(255, 102, 0, 0.1);
+    }
+
+    .otp-input {
+      letter-spacing: 16px;
+      text-align: center;
+      font-size: 28px !important;
+      font-weight: 800;
+      color: #ff6600 !important;
+    }
+
     .btn-primary {
-      margin-top: 8px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 11px 18px;
-      background: var(--vivere-orange);
+      margin-top: 10px;
+      padding: 16px;
+      background: #ff6600;
       color: white;
-      border: 1px solid var(--vivere-orange);
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 15px;
       cursor: pointer;
-      transition: all var(--duration) var(--ease);
+      transition: all 0.2s;
     }
-    .btn-primary svg { width: 15px; height: 15px; transition: transform var(--duration) var(--ease); }
-    .btn-primary:hover:not(:disabled) {
-      background: var(--vivere-orange-hover);
-      border-color: var(--vivere-orange-hover);
+
+    .btn-primary:hover:not(:disabled) { 
+      background: #e65c00;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 102, 0, 0.2);
     }
-    .btn-primary:hover:not(:disabled) svg { transform: translateX(2px); }
-    .btn-primary:active:not(:disabled) { background: var(--vivere-orange-active); }
+    
     .btn-primary:disabled {
-      background: var(--surface-sunken);
-      color: var(--text-muted);
-      border-color: var(--border);
+      background: #f1f5f9;
+      color: #94a3b8;
       cursor: not-allowed;
     }
 
+    .auth-actions { text-align: center; }
+
+    .btn-link {
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .btn-link:hover { color: #ff6600; text-decoration: underline; }
+
     .msg-error {
-      margin: 0;
-      padding: 9px 12px;
-      background: var(--status-danger-bg);
-      border: 1px solid var(--status-danger-border);
-      border-radius: var(--radius);
-      color: var(--status-danger);
-      font-size: 12.5px;
+      padding: 14px;
+      background: #fff1f2;
+      border: 1px solid #fecaca;
+      color: #be123c;
+      font-size: 14px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    .card-footer {
+      text-align: center;
+      font-size: 12px;
+      color: #cbd5e1;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 20px;
       font-weight: 500;
     }
 
-    .link-row {
-      margin: 0;
-      text-align: center;
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-    .link-row a {
-      color: var(--vivere-orange);
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .link-row a:hover { text-decoration: underline; }
-
-    @media (max-width: 900px) {
-      .auth-page { grid-template-columns: 1fr; }
-      .auth-brand { padding: 32px; }
-      .brand-title { font-size: 28px; }
-      .brand-features { display: none; }
+    @media (max-width: 950px) {
+      .auth-wrapper { 
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding: 20px;
+      }
+      .auth-sidebar { align-items: center; text-align: center; }
+      .abstract-graphic { display: none; }
+      .brand-container { margin-bottom: 20px; }
     }
   `]
 })
@@ -391,10 +434,7 @@ export class LoginComponent {
   private router = inject(Router);
 
   step = signal<'login' | 'register' | 'otp'>('login');
-  
-  // A propriedade 'role' está agora inicializada na declaração
   userData = { name: '', email: '', password: '', role: 'PRODUCAO' };
-  
   otpCode = '';
   errorMessage = '';
   year = new Date().getFullYear();
@@ -409,9 +449,7 @@ export class LoginComponent {
     this.authService.register(this.userData).subscribe({
       next: () => this.step.set('otp'),
       error: (err: HttpErrorResponse) => {
-        this.errorMessage = err.status === 400
-          ? 'Este e-mail já está cadastrado.'
-          : 'Erro de comunicação com o servidor.';
+        this.errorMessage = err.status === 400 ? 'E-mail já cadastrado no sistema.' : 'Falha na conexão com o servidor.';
       }
     });
   }
@@ -419,7 +457,7 @@ export class LoginComponent {
   verifyOtp() {
     this.authService.verifyOtp(this.userData.email, this.otpCode).subscribe({
       next: () => this.step.set('login'),
-      error: () => this.errorMessage = 'Código inválido ou expirado.'
+      error: () => this.errorMessage = 'O código inserido é inválido.'
     });
   }
 
@@ -429,9 +467,8 @@ export class LoginComponent {
         this.userStore.setTokens(tokens);
         this.router.navigate(['/dashboard']);
       },
-      error: (err: any) => {
-        console.error('Erro detalhado no login:', err);
-        alert('Falha no login: verifique suas credenciais.');
+      error: () => {
+        alert('Credenciais incorretas.');
       }
     });
   }
