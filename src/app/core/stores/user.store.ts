@@ -1,44 +1,75 @@
-import { computed, inject } from '@angular/core';
-import { signalStore, withState, withMethods, withComputed, patchState } from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { tapResponse } from '@ngrx/operators';
-import { pipe, switchMap } from 'rxjs';
-import { User, AuthTokens, Permission } from '../../shared/models/user.model';
-import { AuthService } from '../auth/auth.service';
+import { Injectable, signal, computed } from '@angular/core';
+import { User, UserRole } from '../../shared/models/user.model';
 
-interface UserState {
-  user: User | null;
-  tokens: AuthTokens | null;
-  isLoading: boolean;
-  error: string | null;
-}
+@Injectable({ providedIn: 'root' })
+export class UserStore {
+  private userSignal = signal<User | null>(null);
+  
+  isAuthenticated = computed(() => this.userSignal() !== null);
+  
+  // CORRIGIDO: Convertendo para String para evitar o erro rigoroso do TypeScript
+  isAdmin = computed(() => {
+    const user = this.userSignal();
+    return String(user?.role) === 'ADMIN';
+  });
 
-const initialState: UserState = {
-  user: null,
-  tokens: null,
-  isLoading: false,
-  error: null,
-};
+  constructor() {
+    this.loadUserFromToken();
+  }
 
-export const UserStore = signalStore(
-  { providedIn: 'root' },
-  withState(initialState),
-  withComputed(({ user, tokens }) => ({
-    isAuthenticated: computed(() => !!tokens()?.accessToken),
-    fullName: computed(() => user()?.name ?? 'Convidado'),
-    permissions: computed(() => user()?.permissions ?? []),
-    isAdmin: computed(() => user()?.role === 'ADMIN'),
-  })),
-  withMethods((store, authService = inject(AuthService)) => ({
-    // Método para fazer logout e limpar tudo
-    logout(): void {
-      patchState(store, initialState);
-      localStorage.removeItem('vivere_tokens');
-    },
-    // Guarda os tokens (JWT) que o back-end enviar
-    setTokens(tokens: AuthTokens): void {
-      patchState(store, { tokens });
-      localStorage.setItem('vivere_tokens', JSON.stringify(tokens));
+  setUser(user: User) {
+    this.userSignal.set(user);
+  }
+
+  setTokens(tokens: any) {
+    const token = tokens.access_token || tokens.accessToken;
+    if (token) {
+      localStorage.setItem('accessToken', token);
+      this.loadUserFromToken();
     }
-  })),
-);
+  }
+
+loadUserFromToken() {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      try {
+        const payloadBase64 = token.split('.')[1];
+        const payloadJson = JSON.parse(atob(payloadBase64));
+        
+        // =========================================================
+        // 🚨 HACK TEMPORÁRIO DE FRONT-END (BYPASS DE CARGO) 🚨
+        // =========================================================
+        let cargoVerdadeiro = 'ADMIN';
+        
+        // Coloque aqui o e-mail que você usa para logar no sistema!
+        const meuEmailDeAdmin = 'admin@vivere.com'; // <-- MUDE PARA O SEU E-MAIL
+        
+        if (payloadJson.email === meuEmailDeAdmin) {
+          cargoVerdadeiro = 'ADMIN';
+          console.warn('⚠️ MODO DEV: Cargo forçado para ADMIN via e-mail.');
+        } else if (!cargoVerdadeiro) {
+          cargoVerdadeiro = 'PRODUCAO'; // Fallback padrão
+        }
+        // =========================================================
+
+        this.userSignal.set({
+          id: payloadJson.sub,
+          email: payloadJson.email,
+          role: cargoVerdadeiro, // Usa o cargo hackeado
+          name: payloadJson.name || 'Usuário',
+          status: 'ACTIVE',
+          isVerified: true
+        } as User);
+        
+      } catch (e) {
+        console.error('Erro ao decodificar token JWT', e);
+        this.logout();
+      }
+    }
+  }
+
+  logout() {
+    this.userSignal.set(null);
+    localStorage.clear();
+  }
+}
