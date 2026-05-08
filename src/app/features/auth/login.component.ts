@@ -63,44 +63,25 @@ import { HttpErrorResponse } from '@angular/common/http';
 
         <main class="auth-main">
           <div class="auth-card">
-            @if (step() === 'register') {
+            @if (step() === 'forgot-password') {
               <div class="auth-head">
-                <h2>Novo Cadastro</h2>
-                <p>Configure o acesso para um novo colaborador no sistema.</p>
-              </div>
-
-              <div class="field">
-                <label>Nome completo</label>
-                <input [(ngModel)]="userData.name" placeholder="Ex: André Ribeiro" />
+                <h2>Recuperação de Senha</h2>
+                <p>Informe seu e-mail corporativo para receber as instruções de redefinição de acesso.</p>
               </div>
               
               <div class="field">
                 <label>E-mail corporativo</label>
-                <input [(ngModel)]="userData.email" type="email" placeholder="voce@empresa.com" />
-              </div>
-              
-              <div class="field">
-                <label>Departamento de Atuação</label>
-                <select [(ngModel)]="userData.role" class="select-role">
-                  <option value="PRODUCAO">Equipe de Produção (Eventos)</option>
-                  <option value="GALPAO">Equipe de Galpão (Estoque)</option>
-                  <option value="ADMIN">Administrador Geral</option>
-                </select>
-              </div>
-
-              <div class="field">
-                <label>Senha de Acesso <span class="hint">mínimo 6 caracteres</span></label>
-                <input [(ngModel)]="userData.password" type="password" placeholder="••••••••" />
+                <input [(ngModel)]="userData.email" type="email" placeholder="voce@vivere.com" />
               </div>
 
               <p *ngIf="errorMessage" class="msg-error">{{ errorMessage }}</p>
 
-              <button class="btn-primary" (click)="register()" [disabled]="!userData.name || !userData.email || userData.password.length < 6">
-                Concluir Registro
+              <button class="btn-primary" (click)="recoverPassword()" [disabled]="!userData.email">
+                Enviar Instruções
               </button>
 
               <div class="auth-actions">
-                <button class="btn-link" (click)="mudarPasso('login')">Já possui conta? Entrar agora</button>
+                <button class="btn-link" (click)="mudarPasso('login')">Voltar para o login</button>
               </div>
             }
 
@@ -145,7 +126,7 @@ import { HttpErrorResponse } from '@angular/common/http';
               </button>
 
               <div class="auth-actions">
-                <button class="btn-link" (click)="mudarPasso('register')">Solicitar novo acesso ao administrador</button>
+                <button class="btn-link" (click)="mudarPasso('forgot-password')">Esqueci minha senha</button>
               </div>
             }
             
@@ -197,7 +178,6 @@ import { HttpErrorResponse } from '@angular/common/http';
       bottom: -250px; right: -50px;
     }
 
-    /* Wrapper maior para acomodar os campos horizontais */
     .auth-wrapper {
       position: relative;
       z-index: 1;
@@ -210,7 +190,6 @@ import { HttpErrorResponse } from '@angular/common/http';
       gap: 60px;
     }
 
-    /* ===== SIDEBAR (ESQUERDA) ===== */
     .auth-sidebar {
       display: flex;
       flex-direction: column;
@@ -221,13 +200,12 @@ import { HttpErrorResponse } from '@angular/common/http';
     }
 
     .brand-logo {
-      max-width: 300px; /* Logo aumentada */
+      max-width: 300px;
       height: auto;
       display: block;
       margin-bottom: 16px;
     }
 
-    /* "Desenhos" Abstratos Detalhados */
     .abstract-graphic {
       display: flex;
       flex-direction: column;
@@ -260,7 +238,6 @@ import { HttpErrorResponse } from '@angular/common/http';
     .highlight { background: rgba(255, 102, 0, 0.3); }
     .highlight-soft { background: #e2e8f0; border: 1px dashed #cbd5e1; height: 20px; }
 
-    /* Novo painel que substitui os quadradinhos */
     .wire-tracks {
       display: flex;
       flex-direction: column;
@@ -286,7 +263,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 
     .footer-wires { margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 20px; }
 
-    /* ===== CARD (DIREITA) ===== */
     .auth-main {
       display: flex;
       justify-content: center;
@@ -295,7 +271,7 @@ import { HttpErrorResponse } from '@angular/common/http';
     .auth-card {
       background: #ffffff;
       width: 100%;
-      max-width: 480px; /* Aumentado horizontalmente */
+      max-width: 480px; 
       padding: 48px;
       border-radius: 16px;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
@@ -327,13 +303,8 @@ import { HttpErrorResponse } from '@angular/common/http';
       font-weight: 700;
       color: #334155;
     }
-    .field .hint {
-      color: #94a3b8;
-      font-weight: 400;
-      font-size: 11.5px;
-    }
 
-    .field input, .select-role {
+    .field input {
       padding: 14px 16px;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
@@ -343,7 +314,7 @@ import { HttpErrorResponse } from '@angular/common/http';
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .field input:focus, .select-role:focus {
+    .field input:focus {
       outline: none;
       background: #ffffff;
       border-color: #ff6600;
@@ -433,25 +404,21 @@ export class LoginComponent {
   private userStore = inject(UserStore);
   private router = inject(Router);
 
-  step = signal<'login' | 'register' | 'otp'>('login');
+  step = signal<'login' | 'forgot-password' | 'otp'>('login');
   userData = { name: '', email: '', password: '', role: 'PRODUCAO' };
   otpCode = '';
   errorMessage = '';
-  year = new Date().getFullYear();
 
-  mudarPasso(novoPasso: 'login' | 'register' | 'otp') {
+  mudarPasso(novoPasso: 'login' | 'forgot-password' | 'otp') {
     this.errorMessage = '';
     this.step.set(novoPasso);
   }
 
-  register() {
+  recoverPassword() {
     this.errorMessage = '';
-    this.authService.register(this.userData).subscribe({
-      next: () => this.step.set('otp'),
-      error: (err: HttpErrorResponse) => {
-        this.errorMessage = err.status === 400 ? 'E-mail já cadastrado no sistema.' : 'Falha na conexão com o servidor.';
-      }
-    });
+    
+    alert(`Instruções de recuperação enviadas para: ${this.userData.email}`);
+    this.mudarPasso('login');
   }
 
   verifyOtp() {
@@ -468,7 +435,7 @@ export class LoginComponent {
         this.router.navigate(['/dashboard']);
       },
       error: () => {
-        alert('Credenciais incorretas.');
+        this.errorMessage = 'Credenciais incorretas.';
       }
     });
   }
